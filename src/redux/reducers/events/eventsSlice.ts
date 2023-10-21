@@ -1,25 +1,47 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { RootState } from '../../store'
+import { EventType } from '../../../lib/types'
 
-const initialState = {
-  event: {},
+type EventSlotType = {
+  start: Date
+  end?: Date | string
+}
+
+type InitialStateType = {
+  event: EventSlotType
+  events: EventType[]
+  eventPage: Date
+}
+
+const initialState: InitialStateType = {
+  event: {
+    start: new Date(),
+  },
   events: [],
+  eventPage: new Date(),
 }
 
 export const eventsSlice = createSlice({
   name: 'events',
   initialState,
   reducers: {
-    setEventData(state, action) {
+    setEventData: (state, action: PayloadAction<EventSlotType>) => {
       state.event = action.payload
     },
-    fetchEventsStart() {},
-    setEvents(state, action) {
+
+    setEvents: (state, action: PayloadAction<EventType[]>) => {
       state.events = action.payload
+    },
+    setEventPage: (state, action: PayloadAction<Date>) => {
+      state.eventPage = action.payload
     },
   },
 })
 
-// Action creators are generated for each case reducer function
-export const { setEventData, setEvents, fetchEventsStart } = eventsSlice.actions
+export const { setEventData, setEvents, setEventPage } = eventsSlice.actions
+
+export const selectEvents = (state: RootState) => state.eventsData.events
+export const selectEvent = (state: RootState) => state.eventsData.event
+export const selectEventPage = (state: RootState) => state.eventsData.eventPage
 
 export default eventsSlice.reducer

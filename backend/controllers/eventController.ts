@@ -1,17 +1,14 @@
-//@ts-nocheck
+// @ts-nocheck
 import { NextApiRequest, NextApiResponse } from 'next'
 import EventModel, { IEvent } from '../models/eventModel'
 import mongoose from 'mongoose'
 
 export const getEvents = async (req: NextApiRequest, res: NextApiResponse) => {
-  //   const { searchParams } = new URL(req.url) // Replace 'http://example.com' with the actual base URL.
-  //   const page = searchParams.get('page') || '1'
   const page = (req.query.page as string) || '1'
 
   try {
-    const events: IEvent[] = await getPaginatedEvents(req)
+    const events: IEvent[] = await getWeekEvents(req, res)
     const eventsJSON = events.map(event => event.toJSON())
-    console.log('{events, res}', { events: eventsJSON, res })
 
     res.status(200).json(eventsJSON)
   } catch (error) {
@@ -20,8 +17,6 @@ export const getEvents = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 export const getEvent = async (req: NextApiRequest, res: NextApiResponse) => {
-  //   const { searchParams } = new URL(req.url) // Replace 'http://example.com' with the actual base URL.
-  //   const eventId = searchParams.get('id')
   const eventId = req.query.id as string
 
   if (!mongoose.Types.ObjectId.isValid(eventId)) {
@@ -55,24 +50,17 @@ export const createEvent = async (req: NextApiRequest, res: NextApiResponse) => 
     return
   }
 
-  console.log('eventData', { eventData })
-
   try {
     const newEvent: IEvent = await EventModel.create(eventData)
-    res.status(200).json({ result: newEvent.toJSON() })
+    res.status(200).json({ result: newEvent.toJSON(), status: 'success' })
   } catch (error) {
-    console.log('ERROR DATABASE operation')
-
     res.status(400).json({ error: error.message })
   }
 }
 
 export const deleteEvent = async (req: NextApiRequest, res: NextApiResponse) => {
-  //   const { searchParams } = new URL(req.url) // Replace 'http://example.com' with the actual base URL.
-  //   const eventId = searchParams.get('id')
   const eventId = req.query.id as string
 
-  console.log('DELETE::', eventId)
   if (!mongoose.Types.ObjectId.isValid(eventId)) {
     res.status(400).json({ error: 'Something is wrong' })
     return
@@ -84,15 +72,13 @@ export const deleteEvent = async (req: NextApiRequest, res: NextApiResponse) => 
       res.status(400).json({ error: 'No such Event' })
       return
     }
-    res.status(200).json(deletedEvent.toJSON())
+    res.status(200).json({ status: 'success' })
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' })
   }
 }
 
 export const updateEvent = async (req: NextApiRequest, res: NextApiResponse) => {
-  //   const { searchParams } = new URL(req.url) // Replace 'http://example.com' with the actual base URL.
-  //   const eventId = searchParams.get('id') as string
   const eventId = req.query.id as string
 
   if (!mongoose.Types.ObjectId.isValid(eventId)) {
@@ -110,36 +96,84 @@ export const updateEvent = async (req: NextApiRequest, res: NextApiResponse) => 
       res.status(400).json({ error: 'No such Event' })
       return
     }
-    res.status(200).json(updatedEvent.toJSON())
+    res.status(200).json({ result: updatedEvent.toJSON(), status: 'success' })
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' })
   }
 }
 
 export const getPaginatedEvents = async (req: NextApiRequest, res: NextApiResponse) => {
-  //   const { searchParams } = new URL(req.url) // Replace 'http://example.com' with the actual base URL.
-  //   const page = searchParams.get('page') || '1'
-  const page = req.query.page as string
-  const userProvidedDate = req.query.date as string
-
-  //   const userProvidedDate = searchParams.get('date')
+  const userProvidedStartDate = req.query.date as string
 
   try {
-    const today = userProvidedDate ? new Date(userProvidedDate) : new Date()
+    const today =
+      userProvidedStartDate && !isNaN(Date.parse(userProvidedStartDate))
+        ? new Date(userProvidedStartDate)
+        : new Date()
 
-    // Calculate the date range for the current month
-    const firstDayOfCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1)
-    const lastDayOfCurrentMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0)
+    // Calculate the end date as 7 days (1 week) from the start date
+    const endDate = new Date(today)
+    endDate.setDate(endDate.getDate() + 7)
 
-    // Construct a filter object for the current month
-    const filterCurrentMonth: { start: { $gte: Date; $lte: Date } } = {
-      start: { $gte: firstDayOfCurrentMonth, $lte: lastDayOfCurrentMonth },
+    // Construct a filter object for the week
+    const filterWeek: { start: { $gte: Date; $lte: Date } } = {
+      start: { $gte: today, $lte: endDate },
     }
 
-    // Query the database for events in the current month
-    const eventsCurrentMonth: IEvent[] = await EventModel.find(filterCurrentMonth)
+    // Query the database for events in the specified week
+    const eventsForWeek: IEvent[] = await EventModel.find(filterWeek)
 
-    res.status(200).json(eventsCurrentMonth.map(event => event.toJSON()))
+    res.status(200).json(eventsForWeek.map(event => event.toJSON()))
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' })
+  }
+}
+
+export const getWeekEvents = async (req: NextApiRequest, res: NextApiResponse) => {
+  const userProvidedStartDate = req.query.date as string
+
+  try {
+    let dateWithoutTimeZone = ''
+    if (userProvidedStartDate) {
+      dateWithoutTimeZone = userProvidedStartDate.replace('Z', '')
+    }
+
+    const startDate =
+      userProvidedStartDate && !isNaN(Date.parse(dateWithoutTimeZone))
+        ? new Date(dateWithoutTimeZone)
+        : new Date()
+
+    // Calculate the start date of the week (Sunday) based on the provided date
+    const startOfWeek = new Date(startDate)
+    startOfWeek.setDate(startDate.getDate() - 1)
+    startOfWeek.setHours(0, 0, 0, 0)
+    console.log('startOfWeek::', startOfWeek)
+
+    // Calculate the end date of the week (Saturday)
+    const endOfWeek = new Date(startDate)
+    endOfWeek.setDate(startDate.getDate() + 6)
+    console.log('endOfWeek::', endOfWeek)
+
+    // Construct a filter object for the week
+    const filterWeek: { start: { $gte: Date; $lte: Date } } = {
+      start: { $gte: startOfWeek, $lte: endOfWeek },
+    }
+
+    const filterRecurring: { recurring: { $ne: string } } = {
+      recurring: { $ne: 'none' },
+    }
+
+    // Combine the filter conditions using the logical OR operator
+    const filter = {
+      $or: [filterWeek, filterRecurring],
+    }
+
+    console.log('filter', filter)
+
+    // Query the database for events in the specified week
+    const eventsForWeek: IEvent[] = await EventModel.find(filter)
+
+    res.status(200).json(eventsForWeek.map(event => event.toJSON()))
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' })
   }

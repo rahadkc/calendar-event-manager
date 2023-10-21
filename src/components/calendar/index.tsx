@@ -1,116 +1,79 @@
-import React, { useState } from 'react'
-import { Calendar, dateFnsLocalizer } from 'react-big-calendar'
-import format from 'date-fns/format'
-import parse from 'date-fns/parse'
-import startOfWeek from 'date-fns/startOfWeek'
-import getDay from 'date-fns/getDay'
-import enUS from 'date-fns/locale/en-US'
+import React, { useCallback, useState } from 'react'
+import { Calendar, NavigateAction, View, Views, dateFnsLocalizer } from 'react-big-calendar'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
-// import { useDispatch, useSelector } from "react-redux";
-// import CreateEventPopUp from "./CreateEventPopup";
-// import { setEventData } from "redux/events/eventsSlice";
-// import DeleteEventPopup from "./DeleteEventPopup";
-const DragAndDropCalendar = withDragAndDrop(Calendar)
+import CreateEventModal from './createEventModal'
+import { format, parse, startOfWeek, getDay, enUS } from '../../lib/date'
+import { useAppDispatch } from '../../redux/hook'
+import { setEventData, setEventPage } from '../../redux/reducers/events/eventsSlice'
+import EditEventModal from './editEventModal'
+import useFetchEvents from '../../hooks/actions/useFetchEvents'
+import CustomToolbar from './customToolbar'
+import BooleanWrapper from '../booleanWrapper'
+import { customDayPropGetter, setEventCellStyling } from './styles/calendar'
 
+const DragAndDropCalendar = withDragAndDrop(Calendar)
 const locales = {
   'en-US': enUS,
 }
 
 let currentDate = new Date()
-let currentDay = currentDate.getDay()
 
 const localizer = dateFnsLocalizer({
   format,
   parse,
-  startOfWeek: () => startOfWeek(currentDate, { weekStartsOn: currentDay } as any),
+  startOfWeek: () => startOfWeek(currentDate, { weekStartsOn: getDay(currentDate) }),
   getDay,
   locales,
 })
 
-const customDayPropGetter = (date: any) => {
-  const currentDate = new Date()
-  if (date < currentDate)
-    return {
-      className: 'disabled-day',
-      style: {
-        cursor: 'not-allowed',
-        background: 'rgba(184, 184, 184, 0.1)',
-      },
-    }
-  else return {}
-}
-
-const CustomCalendar = ({ events = [], height, style, ...calendarProps }: any) => {
+const EventCalendar = ({ events = [], height, style, ...calendarProps }: any) => {
   const calendarRef = React.createRef()
-  //   const dispatch = useDispatch();
-  const [openDialog, setOpenDialog] = useState(false)
-  const [openRemoveDialog, setOpenRemoveDialog] = useState(false)
-  const [data, setData] = useState({})
-  console.log(currentDate, ':::events:::', events)
-
-  const setEventCellStyling = (event: any) => {
-    if (event.background) {
-      let style = {
-        background: 'rgba(7, 97, 125, 0.1)',
-        border: `1px solid ${event.background}`,
-        color: '#07617D',
-        borderLeft: `3px solid ${event.background}`,
-
-        fontWeight: 600,
-        fontSize: '11px',
-      }
-      return { style }
-    }
-    let style = {
-      background: 'rgba(7, 97, 125, 0.1)',
-      border: '1px solid #07617D',
-      color: '#07617D',
-      borderLeft: '3px solid #07617D',
-
-      fontWeight: 600,
-      fontSize: '11px',
-    }
-    return { style }
-  }
+  const dispatch = useAppDispatch()
+  const [openModal, setOpenModal] = useState(false)
+  const [isEdit, setIsEdit] = useState(false)
+  const [selectedEvent, setSelectedEvent] = useState({})
+  const [nextWeekDate, setNextWeekDate] = useState<Date>(new Date())
+  useFetchEvents({ date: nextWeekDate })
 
   const formats = {
     weekdayFormat: 'EEE',
     timeGutterFormat: 'hh a',
   }
 
-  const handleSelect = ({ start, end }: any) => {
-    const currentDate = '2023-10-22T21:04'
-    console.log('start, end', start, end)
+  const handleSlotSelect = useCallback(({ start, end }: { start: Date; end: Date }) => {
+    const currentDate = new Date()
 
     if (start < currentDate) {
       return null
     }
     if (start > end) return
 
-    handleOpenPopup()
-    // dispatch(setEventData({ start, end }));
+    dispatch(setEventData({ start, end }))
+    handleOpenModal()
+  }, [])
+
+  const handleOpenModal = () => {
+    setOpenModal(true)
   }
-  const handleOpenPopup = () => {
-    setOpenDialog(true)
-  }
-  const handleEventSelect = (event: any) => {
-    handleRemoveDialogOpen()
-    setData(event)
-    console.log(event)
-  }
-  const handleRemoveDialogOpen = () => {
-    setOpenRemoveDialog(true)
-  }
-  const handleRemoveDialogClose = () => {
-    setOpenRemoveDialog(false)
-    // setEventData({});
-    setData({})
-  }
-  const handleDialogClose = () => {
-    setOpenDialog(false)
-    // dispatch(setEventData({}));
-  }
+  const handleEventSelect = useCallback((event: any) => {
+    setIsEdit(true)
+    setSelectedEvent(event)
+    handleOpenModal()
+  }, [])
+
+  const handleModalClose = useCallback(() => {
+    setOpenModal(false)
+    setIsEdit(false)
+  }, [])
+
+  const handleNavigate = useCallback((date: Date, view: View, action: NavigateAction) => {
+    if (view === 'agenda' || view === 'day') {
+      return // Disable navigation
+    }
+    setNextWeekDate(date)
+    dispatch(setEventPage(date))
+  }, [])
 
   return (
     <>
@@ -121,29 +84,30 @@ const CustomCalendar = ({ events = [], height, style, ...calendarProps }: any) =
         popup={true}
         events={events}
         selectable
-        resizable
+        resizable={false}
         longPressThreshold={1}
         eventPropGetter={setEventCellStyling}
         dayPropGetter={customDayPropGetter}
-        onSelectSlot={handleSelect}
+        onSelectSlot={handleSlotSelect}
         onSelectEvent={handleEventSelect}
-        // views={{ week: true }}
+        onNavigate={handleNavigate}
+        defaultView={Views.WEEK}
+        views={{ month: false, week: true, day: true, agenda: true }}
         step={30}
-        // drilldownView={"week"}
         scrollToTime={currentDate.getHours()}
-        defaultView={'month'}
-        style={{ height: height ? height : '68vh', ...style }}
+        style={{ height: height ? height : 'calc(100vh - 20px)', ...style }}
+        components={{ toolbar: CustomToolbar }}
         {...calendarProps}
       />
 
-      {/* <CreateEventPopUp open={openDialog} handleClose={handleDialogClose} />
-      <DeleteEventPopup
-        open={openRemoveDialog}
-        handleClose={handleRemoveDialogClose}
-        event={data}
-      /> */}
+      <BooleanWrapper shouldRender={isEdit && openModal}>
+        <EditEventModal open={openModal} handleClose={handleModalClose} selectedEvent={selectedEvent} />
+      </BooleanWrapper>
+      <BooleanWrapper shouldRender={!isEdit && openModal}>
+        <CreateEventModal open={openModal} handleClose={handleModalClose} />
+      </BooleanWrapper>
     </>
   )
 }
 
-export default CustomCalendar
+export default EventCalendar
