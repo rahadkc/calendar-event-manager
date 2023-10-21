@@ -65,7 +65,7 @@ yarn dev
 - [React testing library](https://testing-library.com/) - For unit and integration test
 - Typescript
 - Mongoose
-
+- Husky - a pre-commit hook to run test and lint before commit
 
 ## Script 
 
