@@ -1,40 +1,113 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Event Manager
+
+Event Manager is a web application for managing events. This application is built using Next.js and React, making it a flexible and efficient tool for handling events. It supports various features like calendar views, recurring events, and more.
+
+## Table of Contents
+
+- [Getting Started](#getting-started)
+  - [Installation](#installation)
+  - [Run](#run)
+- [Tools](#tools)
+- [Scripts](#scripts)
 
 ## Getting Started
 
-First, run the development server:
+Before you can use Event Manager, you need to install its dependencies. Follow these steps:
+
+1. Clone this repository to your local machine.
+
+```bash
+git clone <repository-url>
+cd event-manager
+```
+
+### Installation
+
+First, install dependencies and initial setup:
+
+```bash
+npm i or yarn
+
+# then for setup pre-commit hook
+
+npm run setup:husky 
+
+#or 
+
+yarn setup:husky
+```
+
+### Run
+
+Then, run the development server:
 
 ```bash
 npm run dev
 # or
 yarn dev
 # or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+#### Project is configured with Eslint config, prettier. If use Vscode editor, code will automatically show error on compile time and will format on save
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+## Tools
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- [SWR](https://swr.vercel.app/) - Used for http request. SWR is a strategy to first return the data from cache (stale), then send the fetch request (revalidate), and finally come with the up-to-date data.
+- [REDUX-TOOLKIT](https://redux-toolkit.js.org/) - State management
+- [Redux-hook-form](https://react-hook-form.com/) - Form control 
+- [ZOD](https://zod.dev/) - Zod is a TypeScript-first schema declaration and validation library.
+- [Recat Icons](https://react-icons.github.io/react-icons/) 
+- [Date-fns](https://date-fns.org/) - Date utility
+- [React-big-calendar](https://github.com/jquense/react-big-calendar)
+- [DaisyUI](https://daisyui.com/) - Tailwind Css component library for default styling and theming
+- [React testing library](https://testing-library.com/) - For unit and integration test
+- Typescript
+- Mongoose
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+## Script 
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+### Test
+ To run test 
+ 
+ ```bash
+ npm run test
+ ```
+ 
+ To clear jest cache
+ ```bash
+ npm run test:clear
+ ```
+ 
+ ### Prettify
+ 
+ To manully format code
+ 
+  ```bash
+ npm run format
+ ```
+ 
+ To check lint issue
+  ```bash
+ npm run lint
+ ```
+ 
+ ### Other
+ 
+ To find unused files or entrypoints
+  ```bash
+ npm run find:unused
+ ```
+ 
+ To analyze the bundle size
+   ```bash
+ npm run analyze
+ 
+ #or
+ npm run analyze:server
+ 
+ #or
+ npm run analyze:browser
+ ```

@@ -1,18 +1,19 @@
 import mongoose, { Schema, Document, Model } from 'mongoose'
+// import { RecurringType } from '../../src/lib/types'
 
 mongoose.Promise = global.Promise
+export type RecurringType = 'none' | 'daily' | 'weekly' | 'monthly' | 'yearly'
 
 export interface IEvent extends Document {
   title: string
   start: Date
   end: Date
+  allDay: boolean
   description?: string
-  timezone?: string
-  start_date?: string
-  end_date?: string
-  start_time?: string
-  end_time?: string
-  background?: string
+  note?: string
+  recurring: RecurringType
+  count?: number
+  interval?: number
 }
 
 const eventSchema = new Schema<IEvent>(
@@ -25,17 +26,19 @@ const eventSchema = new Schema<IEvent>(
       type: Date,
       required: true,
     },
-    end: {
-      type: Date,
-      required: true,
+    end: Date,
+    allDay: {
+      type: Boolean,
+      default: false,
     },
     description: String,
-    timezone: String,
-    start_date: String,
-    end_date: String,
-    start_time: String,
-    end_time: String,
-    background: String,
+    note: String,
+    recurring: {
+      type: String,
+      default: 'none',
+    },
+    count: Number,
+    interval: Number,
   },
   { timestamps: true, _id: true }
 )
