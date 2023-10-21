@@ -7,6 +7,7 @@ Event Manager is a web application for managing events. This application is buil
 - [Getting Started](#getting-started)
   - [Installation](#installation)
   - [Run](#run)
+- [Database](#database)
 - [Tools](#tools)
 - [Scripts](#scripts)
 
@@ -48,6 +49,11 @@ yarn dev
 # or
 ```
 
+## Database
+
+Create a `.env` file in root directory. An example .env.example file added with key.
+
+Add your mongoDB uri in env file.
 
 #### Project is configured with Eslint config, prettier. If use Vscode editor, code will automatically show error on compile time and will format on save
 
