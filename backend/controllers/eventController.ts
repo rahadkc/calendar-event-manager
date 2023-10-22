@@ -102,33 +102,6 @@ export const updateEvent = async (req: NextApiRequest, res: NextApiResponse) => 
   }
 }
 
-export const getPaginatedEvents = async (req: NextApiRequest, res: NextApiResponse) => {
-  const userProvidedStartDate = req.query.date as string
-
-  try {
-    const today =
-      userProvidedStartDate && !isNaN(Date.parse(userProvidedStartDate))
-        ? new Date(userProvidedStartDate)
-        : new Date()
-
-    // Calculate the end date as 7 days (1 week) from the start date
-    const endDate = new Date(today)
-    endDate.setDate(endDate.getDate() + 7)
-
-    // Construct a filter object for the week
-    const filterWeek: { start: { $gte: Date; $lte: Date } } = {
-      start: { $gte: today, $lte: endDate },
-    }
-
-    // Query the database for events in the specified week
-    const eventsForWeek: IEvent[] = await EventModel.find(filterWeek)
-
-    res.status(200).json(eventsForWeek.map(event => event.toJSON()))
-  } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' })
-  }
-}
-
 export const getWeekEvents = async (req: NextApiRequest, res: NextApiResponse) => {
   const userProvidedStartDate = req.query.date as string
 
