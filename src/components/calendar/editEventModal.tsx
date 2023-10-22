@@ -4,7 +4,7 @@ import EventForm from '../form/events/eventForm'
 import useUpdateEvent from '../../hooks/actions/useUpdateEvent'
 import { dateToISOStringLocal } from '../../lib/date'
 import { EventType } from '../../lib/types'
-import { toast } from '../../lib/toast'
+import { showToast } from '../../lib/toast'
 import { revalidateLiveQueries } from '../../http/swrConfigProvider'
 
 const EditEventModal = ({ handleClose, open, selectedEvent }: any) => {
@@ -22,17 +22,17 @@ const EditEventModal = ({ handleClose, open, selectedEvent }: any) => {
         queryParams: { id: selectedEvent._id },
       })
       if (response.status === 'success') {
-        toast.success('Event created successfully')
+        showToast({ type: 'success', message: 'Event updated successfully' })
         revalidateLiveQueries()
         handleClose()
       }
 
       if (response.error) {
-        toast.error('Event Update Failed')
+        showToast({ type: 'error', message: 'Event updated successfully' })
         handleClose()
       }
     } catch (error) {
-      toast.error('Event Update Failed')
+      showToast({ type: 'error', message: 'Event updated successfully' })
       console.error(error)
       handleClose()
     }
@@ -40,15 +40,7 @@ const EditEventModal = ({ handleClose, open, selectedEvent }: any) => {
 
   return (
     <Modal open={open} onClose={handleClose} title={'Edit Event'} disableClickOutside>
-      <div
-        style={{
-          //   background: 'white',
-          top: '30%',
-          left: '10%',
-          minWidth: '450px',
-          paddingBottom: '64px',
-        }}
-      >
+      <div className="pb-9">
         <EventForm
           selectedEvent={event}
           handleSubmitForm={handleEditEvent}

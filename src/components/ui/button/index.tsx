@@ -22,7 +22,7 @@ const Button = ({ variant, customClass = '', children, isLoading, round = false,
   return (
     <button
       role="button"
-      className={`btn ${variant ? variant : ''} ${round ? 'rounded-full' : ''} ${customClass}`}
+      className={`btn rounded-md ${variant ? variant : ''} ${round ? 'rounded-full' : ''} ${customClass}`}
       {...rest}
     >
       {isLoading ? <Loader /> : children}

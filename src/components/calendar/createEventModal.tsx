@@ -1,6 +1,6 @@
 import Modal from '../ui/modal'
 import { selectEvent } from '../../redux/reducers/events/eventsSlice'
-import { toast } from '../../lib/toast'
+import { showToast } from '../../lib/toast'
 import { useAppSelector } from '../../redux/hook'
 import useCreateEvent from '../../hooks/actions/useCreateEvent'
 import { revalidateLiveQueries } from '../../http/swrConfigProvider'
@@ -31,11 +31,11 @@ const CreateEventModal = ({ handleClose, open }: any) => {
 
       if (response.status === 'success') {
         revalidateLiveQueries()
-        toast.success('Event created successfully')
+        showToast({ type: 'success', message: 'Event created successfully' })
         handleClose()
       }
       if (response.error) {
-        toast.error('Event Creation Failed')
+        showToast({ type: 'error', message: 'Event Creation Failed' })
         handleClose()
       }
     } catch (error) {

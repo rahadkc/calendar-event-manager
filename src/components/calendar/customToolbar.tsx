@@ -1,10 +1,11 @@
 import React, { useCallback } from 'react'
 import { BackArrow, ForwardArrow } from '../../lib/icons'
 import PageTitle from '../pageTitle'
+import { View } from 'react-big-calendar'
 
 export interface ICustomTooolbarProps {
-  view: string
-  views: string[]
+  view: View
+  views: View[]
   label: any
   localizer: any
   onNavigate: (action: any) => void
@@ -28,19 +29,20 @@ export const views = {
   AGENDA: 'agenda',
 }
 
-const CustomToolbar: React.FC<ICustomTooolbarProps> = props => {
+const CustomToolbar = (props: ICustomTooolbarProps) => {
   const navigate = (action: any) => {
     props.onNavigate(action)
   }
 
-  const viewItem = (view: string) => {
+  const viewItem = (view: View) => {
     props.onView(view)
   }
 
   const viewNamesGroup = useCallback(() => {
     const { views, view } = props
+
     if (views.length > 1) {
-      return views.map(name => {
+      return views.map((name: View) => {
         return (
           <button
             type="button"
@@ -58,7 +60,7 @@ const CustomToolbar: React.FC<ICustomTooolbarProps> = props => {
   return (
     <div className="rbc-toolbar pr-5 pl-5 mt--7 mb--7 !mb-0">
       <PageTitle title="Events" />
-      <span className="rbc-btn-group btn-group ml-10">
+      <span className="rbc-btn-group !btn-group ml-10">
         <button
           type="button"
           className={`btn btn-sm rounded ${props.view === 'agenda' ? 'btn-disabled' : ''}`}
