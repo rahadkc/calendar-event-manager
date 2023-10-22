@@ -11,7 +11,12 @@ type LoaderType = {
 const Loader = ({ color = COLOR_TYPE.PRIMARY, size = SIZE_TYPE.MD, variant, customClass }: LoaderType) => {
   const COLOR = `text-${color}`
   const SIZE = `loading-${size}`
-  return <span data-testid="loader" className={`loading ${SIZE} ${variant} ${COLOR} ${customClass}`}></span>
+  return (
+    <>
+      <span data-testid="loader" className={`loading ${SIZE} ${variant} ${COLOR} ${customClass}`}></span>
+      Loading
+    </>
+  )
 }
 
 export default memo(Loader)

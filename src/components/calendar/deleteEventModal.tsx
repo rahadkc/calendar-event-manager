@@ -1,6 +1,6 @@
 import React from 'react'
 import Modal from '../ui/modal'
-import { toast } from '../../lib/toast'
+import { showToast } from '../../lib/toast'
 import Button, { ButtonVariant } from '../ui/button'
 import useDeleteEvent from '../../hooks/actions/useDeleteEvent'
 import { revalidateLiveQueries } from '../../http/swrConfigProvider'
@@ -23,18 +23,19 @@ const DeleteEventModal = ({ handleClose, handleEditModalClose, open, eventId }: 
       })
 
       if (response.status === 'success') {
-        toast.success('Delete Event success')
+        showToast({ type: 'success', message: 'Event deleted successfully' })
         revalidateLiveQueries()
         handleClose()
         handleEditModalClose()
       }
 
       if (response.error) {
-        toast.error('Event Delete Failed')
+        showToast({ type: 'error', message: 'Delete Failed' })
         handleClose()
       }
     } catch (error) {
-      toast.error('Event Delete Failed')
+      showToast({ type: 'error', message: 'Delete Failed' })
+
       console.error(error)
       handleClose()
     }

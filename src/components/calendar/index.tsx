@@ -34,6 +34,7 @@ const EventCalendar = ({ events = [], height, style, ...calendarProps }: any) =>
   const [isEdit, setIsEdit] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState({})
   const [nextWeekDate, setNextWeekDate] = useState<Date>(new Date())
+
   useFetchEvents({ date: nextWeekDate })
 
   const formats = {
