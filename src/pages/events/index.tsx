@@ -1,23 +1,32 @@
 import EventCalendar from '../../components/calendar'
-import React, { useMemo } from 'react'
-import { useAppSelector } from '../../redux/hook'
-import { selectEventPage, selectEvents } from '../../redux/reducers/events/eventsSlice'
+import React, { useEffect, useMemo } from 'react'
+import { useAppDispatch, useAppSelector } from '../../redux/hook'
+import { selectEventPage, selectEvents, setEventPage } from '../../redux/reducers/events/eventsSlice'
 import { isString } from '../../lib/helpers'
 import { generateRecurringEvents } from '../../components/calendar/rrule'
+import useURLParams from '../../hooks/useURLParams'
 
 const Events = () => {
+  const dispatch = useAppDispatch()
   const events = useAppSelector(selectEvents)
   const eventDate = useAppSelector(selectEventPage)
+  const { getParams } = useURLParams()
+  const { start: startParam } = getParams(['start'], ['start'])
+
+  const startDateParam = useMemo(() => {
+    return new Date(startParam || new Date())
+  }, [JSON.stringify(startParam)])
 
   const startDate = useMemo(() => {
     return isString(eventDate) ? new Date() : eventDate
   }, [eventDate])
 
   const endDate = useMemo(() => {
-    const newDate = new Date(startDate)
-    const endDate = new Date(newDate.setDate(startDate.getDate() + 6))
+    const newStartDate = startDate || startDateParam
+    const newDate = new Date(newStartDate)
+    const endDate = new Date(newDate.setDate(newStartDate.getDate() + 6))
     return endDate
-  }, [startDate])
+  }, [startDate, startDateParam])
 
   const calendarEvents = useMemo(() => {
     let calendarEvents
@@ -27,7 +36,13 @@ const Events = () => {
     return calendarEvents
   }, [events, startDate])
 
-  return <EventCalendar events={calendarEvents} />
+  useEffect(() => {
+    if (startDateParam) {
+      dispatch(setEventPage(startDateParam))
+    }
+  }, [String(startDateParam)])
+
+  return <EventCalendar events={calendarEvents} defaultDate={startDateParam} />
 }
 
 export default Events
