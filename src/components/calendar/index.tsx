@@ -11,6 +11,7 @@ import useFetchEvents from '../../hooks/actions/useFetchEvents'
 import CustomToolbar from './customToolbar'
 import BooleanWrapper from '../booleanWrapper'
 import { customDayPropGetter, setEventCellStyling } from './styles/calendar'
+import { useRouter } from 'next/router'
 
 const DragAndDropCalendar = withDragAndDrop(Calendar)
 const locales = {
@@ -27,13 +28,14 @@ const localizer = dateFnsLocalizer({
   locales,
 })
 
-const EventCalendar = ({ events = [], height, style, ...calendarProps }: any) => {
+const EventCalendar = ({ events = [], height, style, defaultDate, ...calendarProps }: any) => {
   const calendarRef = React.createRef()
+  const router = useRouter()
   const dispatch = useAppDispatch()
   const [openModal, setOpenModal] = useState(false)
   const [isEdit, setIsEdit] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState({})
-  const [nextWeekDate, setNextWeekDate] = useState<Date>(new Date())
+  const [nextWeekDate, setNextWeekDate] = useState<Date>(defaultDate || new Date())
 
   useFetchEvents({ date: nextWeekDate })
 
@@ -72,6 +74,7 @@ const EventCalendar = ({ events = [], height, style, ...calendarProps }: any) =>
     if (view === 'agenda' || view === 'day') {
       return // Disable navigation
     }
+    router.push('', { query: { start: String(date) } })
     setNextWeekDate(date)
     dispatch(setEventPage(date))
   }, [])
@@ -98,6 +101,7 @@ const EventCalendar = ({ events = [], height, style, ...calendarProps }: any) =>
         scrollToTime={currentDate.getHours()}
         style={{ height: height ? height : 'calc(100vh - 20px)', ...style }}
         components={{ toolbar: CustomToolbar }}
+        defaultDate={defaultDate}
         {...calendarProps}
       />
 
