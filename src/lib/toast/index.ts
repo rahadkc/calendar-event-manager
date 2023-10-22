@@ -1,3 +1,16 @@
-import toast, { Toaster } from 'react-hot-toast'
+import toast, { ToastOptions, ToastType, Toaster } from 'react-hot-toast'
 
-export { toast, Toaster }
+const showToast = ({
+  type,
+  message,
+  options,
+}: {
+  type: ToastType
+  message: string
+  options?: ToastOptions
+}) => {
+  //@ts-ignore
+  toast[type](message, options)
+}
+
+export { toast, Toaster, showToast }
