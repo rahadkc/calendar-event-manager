@@ -13,6 +13,17 @@ Event Manager is a web application for managing events. This application is buil
 
 ## Getting Started
 
+### Docker
+Make sure you have installed Docker in your machine. \
+With docker you just have to run one command from your terminal to run project.\
+To persist data to database have to set environment variable in .env file
+
+```bash
+docker-compose up --build
+```
+
+
+### Manuel setup
 Before you can use Event Manager, you need to install its dependencies. Follow these steps:
 
 1. Clone this repository to your local machine.
