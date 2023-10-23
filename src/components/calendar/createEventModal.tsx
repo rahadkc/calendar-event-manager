@@ -39,6 +39,7 @@ const CreateEventModal = ({ handleClose, open }: any) => {
         handleClose()
       }
     } catch (error) {
+      handleClose()
       console.error(error)
     }
   }, [])

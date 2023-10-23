@@ -16,9 +16,8 @@ export const setEventCellStyling = (event: any) => {
     let style = {
       background: 'rgba(7, 97, 125, 0.1)',
       border: `1px solid ${event.background}`,
-      color: '#07617D',
+      color: 'var(--accent-color)',
       borderLeft: `3px solid ${event.background}`,
-
       fontWeight: 600,
       fontSize: '11px',
     }
@@ -26,10 +25,10 @@ export const setEventCellStyling = (event: any) => {
   }
   let style = {
     background: 'rgba(7, 97, 125, 0.1)',
-    border: '1px solid #07617D',
-    color: '#07617D',
-    borderLeft: '3px solid #07617D',
-
+    border: '1px solid var(--accent-color)',
+    color: 'var(--accent-color)',
+    borderLeft: '3px solid var(--accent-color)',
+    borderRadius: '0px',
     fontWeight: 600,
     fontSize: '11px',
   }
