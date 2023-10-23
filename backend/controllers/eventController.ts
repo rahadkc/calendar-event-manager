@@ -1,13 +1,12 @@
-// @ts-nocheck
+//@ts-nocheck
 import { NextApiRequest, NextApiResponse } from 'next'
 import EventModel, { IEvent } from '../models/eventModel'
 import mongoose from 'mongoose'
 
 export const getEvents = async (req: NextApiRequest, res: NextApiResponse) => {
-  const page = (req.query.page as string) || '1'
-
   try {
-    const events: IEvent[] = await getWeekEvents(req, res)
+    const events: IEvent[] = await getWeekEvents(req)
+
     const eventsJSON = events.map(event => event.toJSON())
 
     res.status(200).json(eventsJSON)
@@ -102,7 +101,7 @@ export const updateEvent = async (req: NextApiRequest, res: NextApiResponse) => 
   }
 }
 
-export const getWeekEvents = async (req: NextApiRequest, res: NextApiResponse) => {
+export const getWeekEvents = async (req: NextApiRequest) => {
   const userProvidedStartDate = req.query.date as string
 
   try {
@@ -146,8 +145,8 @@ export const getWeekEvents = async (req: NextApiRequest, res: NextApiResponse) =
     // Query the database for events in the specified week
     const eventsForWeek: IEvent[] = await EventModel.find(filter)
 
-    res.status(200).json(eventsForWeek.map(event => event.toJSON()))
+    return eventsForWeek
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' })
+    throw new Error('Internal Server Error')
   }
 }
