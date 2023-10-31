@@ -16,7 +16,23 @@ Event Manager is a web application for managing events. This application is buil
 ### Docker
 Make sure you have installed Docker in your machine. \
 With docker you just have to run one command from your terminal to run project.\
-To persist data to database have to set environment variable in .env file
+To persist data to database have to set environment variable in .env file. See .env.example
+
+
+MongoDB local connection issue: 
+
+might cause issue:
+```bash
+mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.1
+```
+
+Replace `127.0.0.1` with `mongo` in URI.
+
+correct:
+```bash
+mongodb://mongo:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.1
+```
+
 
 ```bash
 docker-compose up --build
