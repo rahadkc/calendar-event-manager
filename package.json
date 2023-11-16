@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3050",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3050",
     "lint": "next lint",
     "test": "jest --watchAll",
     "test:verbose": "jest --watchAll --verbose",
@@ -17,7 +17,12 @@
     "analyze": "ANALYZE=true next build",
     "analyze:server": "BUNDLE_ANALYZE=server next build",
     "analyze:browser": "BUNDLE_ANALYZE=browser next build",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "cypress:open": "cypress open",
+    "e2e": "start-server-and-test dev http://localhost:3050 \"cypress open --e2e\"",
+    "e2e:headless": "start-server-and-test dev http://localhost:3050 \"cypress run --e2e\"",
+    "e2e:component": "cypress open --component",
+    "e2e:component:headless": "cypress run --component"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
@@ -55,6 +60,7 @@
     "@types/react-redux": "^7.1.27",
     "@types/redux-logger": "^3.0.10",
     "autoprefixer": "^10",
+    "cypress": "^13.5.0",
     "daisyui": "^3.9.2",
     "eslint": "^8",
     "eslint-config-next": "13.5.4",
@@ -68,11 +74,12 @@
     "postcss": "^8",
     "prettier": "^3.0.3",
     "redux-logger": "^3.0.6",
+    "start-server-and-test": "^2.0.2",
     "supertest": "^6.3.3",
     "tailwindcss": "^3.3.3",
     "typescript": "^5"
   },
   "engines": {
-    "node": ">=16.0.0 <20.0.0"
+    "node": ">=16.0.0 <21.0.0"
   }
 }

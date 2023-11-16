@@ -2,6 +2,7 @@ import { Inter } from 'next/font/google'
 import Events from './events'
 import ErrorBoundary from '../components/errorBoundary'
 import Head from 'next/head'
+import Link from 'next/link'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -14,6 +15,9 @@ export default function Home() {
       </Head>
       <main className={`calendar-container mx-auto ${inter.className}`}>
         <ErrorBoundary>
+          <Link className="button" href="/about">
+            About
+          </Link>
           <Events />
         </ErrorBoundary>
       </main>
